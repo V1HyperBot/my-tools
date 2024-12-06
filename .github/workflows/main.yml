@@ -1,0 +1,32 @@
+name: Clear Commit History
+
+on:
+  workflow_dispatch:
+
+jobs:
+  clear-history:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.email "support@hacker.ltd"
+          git config --global user.name "hacker"
+
+      - name: Clear commit history
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          git checkout --orphan temp-branch
+          git add -A
+          git commit -m "Clear commit history"
+
+          git branch -D $BRANCH
+          git branch -m $BRANCH
+
+          git push --force origin $BRANCH
